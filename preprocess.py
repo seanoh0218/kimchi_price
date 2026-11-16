@@ -6,7 +6,7 @@ BASE = Path(__file__).resolve().parent
 
 def preprocess(base_path):
     """데이터 전처리 함수"""
-    print('전처리 함수 동작 시작')
+    print('===전처리 함수 동작 시작===')
 
     # csv 읽기
     climate = pd.read_csv(base_path / 'raw_data/climate.csv', encoding='utf-8-sig')
@@ -80,7 +80,7 @@ def preprocess(base_path):
     print('날짜 중복 건수:', price.duplicated(subset='date').sum())
     print('가격 결측치(0) 건수:', (price['price'] == 0).sum())
     
-    print('전처리 함수 동작 끝')
+    print('===전처리 함수 동작 끝===')
 
     return df
 
