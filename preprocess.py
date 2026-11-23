@@ -112,6 +112,19 @@ def preprocess(base_path):
     # X 데이터와 y 데이터 통합
     df = pd.merge(price, climate, on='date', how='inner')
 
+    # 시차 적용: 가격 날짜 기준 과거 데이터 편차 평균
+    clim_daily = climate.set_index('date').sort_index().asfreq('D')  # 빠진 날짜를 채워서 1행 = 1일로 맞춤
+    windows = {30: 1, 60: 31, 90: 61}  # 이름: 며칠 전부터 시작하는지
+
+    for name, start in windows.items():
+        lagged = clim_daily[cols].shift(start).rolling(30, min_periods=25).mean()
+        lagged.columns = [f'{c}_{name}' for c in cols]
+        lagged = lagged.reset_index()
+
+        df_lag = pd.merge(price, lagged, on='date', how='inner').dropna().reset_index(drop=True)
+        df_lag.to_csv(base_path / f'data/data_lag_{name}.csv', index=False, encoding='utf-8-sig')
+        print(f'{name}일 윈도우 행 수:', len(df_lag))
+
     # 데이터 내보내기(csv)
     climate.to_csv(base_path / 'data/climate.csv', index=False, encoding='utf-8-sig')
     price.to_csv(base_path / 'data/price.csv', index=False, encoding='utf-8-sig')
