@@ -4,7 +4,7 @@ from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
 
-def preprocess(base_path):
+def preprocess(base_path: Path = BASE):
     """데이터 전처리 함수"""
     print('===전처리 함수 동작 시작===')
 
@@ -141,6 +141,6 @@ def preprocess(base_path):
 
 
 if __name__ == '__main__':
-    df = preprocess(BASE)
+    df = preprocess()
     print(df.head())
     print(df.describe())
