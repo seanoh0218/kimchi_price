@@ -23,25 +23,25 @@ def train(X: pd.DataFrame, y: pd.Series):
 
 
 def evaluate(model, fname: str, X_test: pd.DataFrame, y_test: pd.Series, base_path: Path = BASE):
-    # 검증 데이터의 배추 가격 예측하기   # ★ 주석 수정 (체지방률 → 배추 가격)
+    # 검증 데이터의 배추 가격 예측하기
     y_pred = model.predict(X_test)
 
     # R2와 RMSE를 이용해 모델 평가하기
     r2 = r2_score(y_test, y_pred)
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
-    print('모든 기상 관측값 사용')
+    print(f'{fname}')
     print(f'R2 = {r2:.3f}')
     print(f'RMSE = {rmse:.2f}')
 
-    fig, ax = plt.subplots()   # ★ ax를 받아야 박스 위치를 고정할 수 있음
+    fig, ax = plt.subplots()
     ax.scatter(y_test, y_pred, alpha=0.7)
 
     min_v = min(y_test.min(), y_pred.min())
     max_v = max(y_test.max(), y_pred.max())
     ax.plot([min_v, max_v], [min_v, max_v], linestyle='--')
 
-    # ★ RMSE, R2 박스
+    # RMSE, R2
     ax.text(
         0.03, 0.97,
         f'RMSE = {rmse:,.0f}원\n$R^2$ = {r2:.3f}',
@@ -53,14 +53,16 @@ def evaluate(model, fname: str, X_test: pd.DataFrame, y_test: pd.Series, base_pa
     ax.set_xlabel('실제 배추 가격')
     ax.set_ylabel('예측 배추 가격')
     ax.set_title('실제 배추 가격 vs. 예측 배추 가격')
-    plt.tight_layout()   # ★ 라벨 잘림 방지
-    plt.savefig(base_path / 'figures/actual_predicted.svg')
+    plt.tight_layout()
+    plt.savefig(base_path / f'figures/{fname}')
     plt.close()
+
+    return y_pred
 
 
 if __name__ == '__main__':
     df = pd.read_csv('data/data_lag_30.csv', parse_dates=['date'])
-    df = df.drop(columns=['temp_min_anom_30', 'temp_max_anom_30']).sort_values('date')
+    df = df.drop(columns=['temp_min_anom_30', 'temp_max_anom_30', 'rainfall_anom_30']).sort_values('date')
 
     # 날짜 기준으로 앞부분은 학습, 뒷부분은 평가
     split = int(len(df) * 0.8)
