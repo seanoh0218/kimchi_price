@@ -106,8 +106,12 @@ def preprocess(base_path: Path = BASE):
     print('price')
     print('중복값 수:', price.duplicated().sum())
     print('결측치 수:', price.isna().sum())
-    price = price.drop_duplicates().reset_index(drop=True)
+    price = price.drop_duplicates(subset='date').reset_index(drop=True)
     price = price.dropna().reset_index(drop=True)
+
+    # 날짜 중복, 가격 결측치 확인
+    print('날짜 중복 건수:', price.duplicated(subset='date').sum())
+    print('가격 결측치(0) 건수:', (price['price'] == 0).sum())
 
     # X 데이터와 y 데이터 통합
     df = pd.merge(price, climate, on='date', how='inner')
@@ -130,10 +134,6 @@ def preprocess(base_path: Path = BASE):
     price.to_csv(base_path / 'data/price.csv', index=False, encoding='utf-8-sig')
     normal.to_csv(base_path / 'data/normal.csv', index=False, encoding='utf-8-sig')
     df.to_csv(base_path / 'data/data.csv', index=False, encoding='utf-8-sig')
-
-    # 날짜 중복, 가격 결측치 확인
-    print('날짜 중복 건수:', price.duplicated(subset='date').sum())
-    print('가격 결측치(0) 건수:', (price['price'] == 0).sum())
     
     print('===전처리 함수 동작 끝===')
 

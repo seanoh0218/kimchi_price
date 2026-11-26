@@ -10,11 +10,10 @@ BASE = Path(__file__).resolve().parent
 
 def plot_scatter_all_data(data: pd.DataFrame, fname: str, base_path: Path = BASE):
     """모든 데이터 산점도 그리기"""
-    # 산점도 그래프를 활용하여 속성 간 관계 확인하기
     sns.pairplot(data)
-    plt.title('데이터 간 상관관계')
-    plt.tight_layout()
-    plt.savefig(base_path / f'figures/{fname}.svg')
+    g = sns.pairplot(data)
+    g.figure.suptitle('데이터 간 상관관계', y=1.02)
+    plt.savefig(base_path / f'figures/{fname}.svg', bbox_inches='tight')
     plt.close()
 
 

@@ -18,7 +18,7 @@ def train(X: pd.DataFrame, y: pd.Series):
     model = LinearRegression()
     model.fit(X, y)
 
-    print(model.coef_, model.intercept_)    
+    print(f'기울기: {model.coef_}, 절편: {model.intercept_}')    
     return model
 
 
@@ -30,7 +30,7 @@ def evaluate(model, fname: str, X_test: pd.DataFrame, y_test: pd.Series, base_pa
     r2 = r2_score(y_test, y_pred)
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
-    print(f'{fname}')
+    print(fname)
     print(f'R2 = {r2:.3f}')
     print(f'RMSE = {rmse:.2f}')
 
@@ -72,4 +72,4 @@ if __name__ == '__main__':
     X_test, y_test = test_data.drop(columns=['date', 'price']), test_data['price']
 
     model = train(X_train, y_train)
-    evaluate(model, 'actual_predict', X_test, y_test)
+    evaluate(model, 'actual_predict.svg', X_test, y_test)

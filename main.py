@@ -2,8 +2,8 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 import pandas as pd
-import koreanize_matplotlib
 import matplotlib.pyplot as plt
+import koreanize_matplotlib
 
 from pathlib import Path
 
@@ -29,16 +29,16 @@ def main():
 
     # 데이터 분석
     print('===데이터 분석===')
-    df_0 = pd.read_csv('data/data.csv').drop(columns=['temp_min_anom', 'temp_max_anom'])
+    df_0 = pd.read_csv(BASE / 'data/data.csv').drop(columns=['temp_min_anom', 'temp_max_anom'])
     df_0['date'] = pd.to_datetime(df_0['date'])
 
-    df_30 = pd.read_csv('data/data_lag_30.csv').drop(columns=['temp_min_anom_30', 'temp_max_anom_30'])
+    df_30 = pd.read_csv(BASE / 'data/data_lag_30.csv').drop(columns=['temp_min_anom_30', 'temp_max_anom_30'])
     df_30['date'] = pd.to_datetime(df_30['date'])
 
-    df_60 = pd.read_csv('data/data_lag_60.csv').drop(columns=['temp_min_anom_60', 'temp_max_anom_60'])
+    df_60 = pd.read_csv(BASE / 'data/data_lag_60.csv').drop(columns=['temp_min_anom_60', 'temp_max_anom_60'])
     df_60['date'] = pd.to_datetime(df_60['date'])
 
-    df_90 = pd.read_csv('data/data_lag_90.csv').drop(columns=['temp_min_anom_90', 'temp_max_anom_90'])
+    df_90 = pd.read_csv(BASE / 'data/data_lag_90.csv').drop(columns=['temp_min_anom_90', 'temp_max_anom_90'])
     df_90['date'] = pd.to_datetime(df_90['date'])
 
     anal.plot_scatter_all_data(df_0, 'scatter_0')
@@ -61,6 +61,8 @@ def main():
         'top1': ['temp_avg_anom_30'],
     }
 
+    combo_labels = {'all': '기온·풍속·습도·일조량', 'top3': '기온·풍속·습도', 'top2': '기온·풍속', 'top1': '기온'}
+
     df = pd.read_csv('data/data_lag_30.csv', parse_dates=['date'])
     df = df.drop(columns=['temp_min_anom_30', 'temp_max_anom_30', 'rainfall_anom_30']).sort_values('date')
 
@@ -70,20 +72,19 @@ def main():
     for name, cols in combos.items():
         model = modeling.train(X_train[cols], y_train)
         predicted = modeling.evaluate(model, f'actual_predicted_{name}.svg', X_test[cols], y_test)
-        predicted = pd.Series(predicted, index=X_test.index)   # 날짜와 짝 맞추려고 인덱스 붙임
+        predicted = pd.Series(predicted, index=X_test.index)
         kimchi_predicted[name] = calculate_kimchi_price(predicted)
     print('===모델 학습 및 평가 끝===')
 
     # 김치 가격 도출
     print('===김치 가격 도출===')
-    test_dates = df.loc[X_test.index, 'date']              # 테스트 구간 날짜
-    kimchi_actual = calculate_kimchi_price(y_test)         # 실제 배추 가격으로 계산한 김치 가격
+    test_dates = df.loc[X_test.index, 'date']
+    kimchi_actual = calculate_kimchi_price(y_test)
 
     plt.figure(figsize=(16, 6))
     plt.plot(test_dates, kimchi_actual, color='black', linewidth=2, label='실제 배추 가격으로 계산한 김치 가격')
     for name, kimchi in kimchi_predicted.items():
-        plt.plot(test_dates, kimchi, alpha=0.8, label=f'예측 김치 가격({name})')
-
+        plt.plot(test_dates, kimchi, alpha=0.8, label=f'예측 김치 가격({combo_labels[name]})')
     plt.xlabel('날짜')
     plt.ylabel('김치 가격(원)')
     plt.title('실제 배추 가격으로 계산한 김치 가격 vs. 예측 김치 가격')
@@ -99,7 +100,6 @@ def main():
     print('===김치 가격 도출 끝===')
 
     # 기후 변화 시나리오
-    combo_labels = {'all': '기온·풍속·습도·일조량', 'top3': '기온·풍속·습도', 'top2': '기온·풍속', 'top1': '기온'}
     scenario_df = simulate_temp_scenario(X_train, y_train, X_test, combos, combo_labels)
     plot_temp_scenario(scenario_df, 'kimchi_scenario')
 
@@ -134,7 +134,7 @@ def simulate_temp_scenario(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd
         means = []
         for delta in scenarios:
             X_scn = X_test[cols].copy()
-            X_scn['temp_avg_anom_30'] += delta   # 기온만 올리고 나머지 변수는 그대로
+            X_scn['temp_avg_anom_30'] += delta
             cabbage = pd.Series(model.predict(X_scn), index=X_scn.index)
             means.append(calculate_kimchi_price(cabbage).mean())
         scenario_result[combo_labels[name]] = means
