@@ -1,5 +1,13 @@
-data/
+# 원본 데이터
 raw_data/
-figures/
 다운로드받은 데이터/
+
+# 가공 데이터는 결과 파일만 올림
+data/*
+!data/kimchi_scenario.csv
+!data/kimchi_price.csv
+
+# 자동 생성 파일
 __pycache__/
+.ipynb_checkpoints/
+.venv/
