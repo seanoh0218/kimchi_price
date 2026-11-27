@@ -106,7 +106,7 @@ def preprocess(base_path: Path = BASE):
     print('price')
     print('중복값 수:', price.duplicated().sum())
     print('결측치 수:', price.isna().sum())
-    price = price.drop_duplicates(subset='date').reset_index(drop=True)
+    price = price.drop_duplicates(subset='date', keep='last').reset_index(drop=True)
     price = price.dropna().reset_index(drop=True)
 
     # 날짜 중복, 가격 결측치 확인
