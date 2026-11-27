@@ -111,7 +111,7 @@ def preprocess(base_path: Path = BASE):
 
     # 날짜 중복, 가격 결측치 확인
     print('날짜 중복 건수:', price.duplicated(subset='date').sum())
-    print('가격 결측치(0) 건수:', (price['price'] == 0).sum())
+    print('가격이 0원인 건수:', (price['price'] == 0).sum())
 
     # X 데이터와 y 데이터 통합
     df = pd.merge(price, climate, on='date', how='inner')

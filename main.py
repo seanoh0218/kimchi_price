@@ -63,7 +63,7 @@ def main():
 
     combo_labels = {'all': '기온·풍속·습도·일조량', 'top3': '기온·풍속·습도', 'top2': '기온·풍속', 'top1': '기온'}
 
-    df = pd.read_csv('data/data_lag_30.csv', parse_dates=['date'])
+    df = pd.read_csv(BASE / 'data/data_lag_30.csv', parse_dates=['date'])
     df = df.drop(columns=['temp_min_anom_30', 'temp_max_anom_30', 'rainfall_anom_30']).sort_values('date')
 
     X_train, X_test, y_train, y_test = split_data(df)
